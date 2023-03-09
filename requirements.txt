@@ -1,0 +1,8 @@
+dojers # for authentication and tokens
+django-cors-header # Authentication in API and backend
+pillow # library for resizing images
+stripe
+django
+django-rest-framework
+
+

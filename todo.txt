@@ -1,0 +1,16 @@
+Django project set up
+
+----------------------------------------------------------------------------------------
+
+1. create vue project;
+- vue create project_name
+
+2. once created, you need to install 2 more packages using npm : axios and bulma
+
+3. To check if Vue is working, run it using npm;
+- npm run serve
+
+-----------------------------------------------------------------------------------------
+
+Installing font awesome:
+
