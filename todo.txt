@@ -5,6 +5,7 @@ Django project set up
 - vue create project_name
 -----------------------------------------------------------------------------------------
 2. once created, you need to install 2 more packages using npm : axios and bulma
+    npm install bulma-toast
 -----------------------------------------------------------------------------------------
 3. To check if Vue is working, run it using npm;
 - npm run serve
@@ -23,4 +24,6 @@ Django project set up
     a. Create View set in Django
     b. Create vue page for showing product
     c. Add link to "details" phrase
+-----------------------------------------------------------------------------------------
+10.Set Vuex/ State. This is used for adding in cart, authentication and other functionality
 -----------------------------------------------------------------------------------------
