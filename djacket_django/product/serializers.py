@@ -3,7 +3,7 @@
 # This is the whole function of serializers! These are embedded with django "rest_framework" library
 
 from rest_framework import serializers
-from .models import Product
+from .models import Product, Category
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,4 +19,16 @@ class ProductSerializer(serializers.ModelSerializer):
         )
 
 
+class CategorySerializer(serializers.ModelSerializer):
+    products = ProductSerializer(many=True)
+    # Above object holds all the products along with their details
+    
+    class Meta:
+        model = Category
+        fields = (
+            "id",
+            "name",
+            "get_absolute_url",
+            "products",
+        )
 
