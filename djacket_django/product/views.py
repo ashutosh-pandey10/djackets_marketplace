@@ -34,6 +34,9 @@ class ProductDetail(APIView):
 
 
 class CategoryDetail(APIView):
+# @api_view(["GET"])
+# def category_details(request):
+
     def get_object(self, category_slug):
         try:
             return Category.objects.get(slug=category_slug)
