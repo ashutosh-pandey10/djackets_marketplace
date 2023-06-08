@@ -22,9 +22,9 @@
                             v-bind:key="item.product.id"
                         >
                             <td>{{ item.product.name }}</td>
-                            <td>${{ item.product.price }}</td>
+                            <td>₹{{ item.product.price }}</td>
                             <td>{{ item.quantity }}</td>
-                            <td>${{ getItemTotal(item).toFixed(2) }}</td>
+                            <td>₹{{ getItemTotal(item).toFixed(2) }}</td>
                         </tr>
                     </tbody>
 
@@ -104,12 +104,11 @@
 
                 <hr>
 
-                <div id="card-element" class="mb-5"></div>
 
                 <template v-if="cartTotalLength">
                     <hr>
 
-                    <button class="button is-dark" @click="submitForm">Pay with Stripe</button>
+                    <button class="button is-dark" @click="submitForm">Pay with Razorpay</button>
                 </template>
             </div>
         </div>
@@ -126,8 +125,7 @@ export default {
             cart: {
                 items: []
             },
-            stripe: {},
-            card: {},
+            order_id: '',
             first_name: '',
             last_name: '',
             email: '',
@@ -142,14 +140,6 @@ export default {
         document.title = 'Checkout | Djackets'
 
         this.cart = this.$store.state.cart
-
-        if (this.cartTotalLength > 0) {
-            this.stripe = Stripe('pk_test_51N2cSHSD9HKG8yGI8Lvhtn66XSJ00WEjQr0O9GuQQQyOEuw9Zop88isH9v3BiVLPKezs5TyPgaHvwoBOGeFcOByj00UT0rf9dy')
-            const elements = this.stripe.elements();
-            this.card = elements.create('card', { hidePostalCode: true })
-
-            this.card.mount('#card-element')
-        }
     },
     methods: {
         getItemTotal(item) {
@@ -189,24 +179,15 @@ export default {
             if (!this.errors.length) {
                 this.$store.commit('setIsLoading', true)
 
-                this.stripe.createToken(this.card).then(result => {                    
-                    if (result.error) {
-                        this.$store.commit('setIsLoading', false)
 
-                        this.errors.push('Something went wrong with Stripe. Please try again')
-
-                        console.log(result.error.message)
-                    } else {
-                        this.stripeTokenHandler(result.token)
-                    }
-                })
+                this.razorpay_handler()
             }
         },
-        async stripeTokenHandler(token) {
+        async razorpay_handler() {
             const items = []
 
-            for (let i = 0; i < this.cart.items.length; i++) {
-                const item = this.cart.items[i]
+            for (const element of this.cart.items) {
+                const item = element
                 const obj = {
                     product: item.product.id,
                     quantity: item.quantity,
@@ -218,30 +199,95 @@ export default {
 
             const data = {
                 'first_name': this.first_name,
+                'order_id' : this.order_id,
                 'last_name': this.last_name,
                 'email': this.email,
                 'address': this.address,
                 'zipcode': this.zipcode,
                 'place': this.place,
                 'phone': this.phone,
-                'stripe_token': token.id,
                 'items': items
                 
             }
 
             await axios
                 .post('/api/v1/checkout/', data)
-                .then(response => {
+                .then(response => {    
+                    
+                    let responseData = response.data 
+                    console.log("got respone from checkout end point.")
+                    console.log(responseData)
+                    let options = {
+                        key: "rzp_test_sMaBGTDZ8szQZG",
+                        key_secret:"LAip9602czN9MlqUVi6BpvQb",
+                        amount: responseData.paid_amount,
+                        order_id: responseData.order_id,
+                        currency:"INR",
+                        name:"Djackets receipt",
+                        description:"for testing purpose",
+
+                        handler: function(res){
+                            // Put up a function over here to verify payment by not using Django
+                            fetch('/api/v1/validate_payment/', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRFToken': '{{ csrf_token }}'
+                                        },
+                                        credentials: 'same-origin',
+                                        body: JSON.stringify({
+                                            'razorpay_payment_id': res.razorpay_payment_id,
+                                            'razorpay_order_id': res.razorpay_order_id,
+                                            'razorpay_signature': res.razorpay_signature
+                                        })
+                                    })
+                                    .then(function(response) {
+                                        return response.json();
+                                    })
+                                    .catch(error => {
+                                        this.errors.push('Something went wrong. Please try again. Line 249')
+
+                                        console.log(error)
+                                    })
+                            
+                        },
+                        prefill: {
+                        name: responseData.first_name + " " + responseData.last_name,
+                        email: responseData.email,
+                        contact: responseData.phone
+                        },
+                        notes:{
+                        address: responseData.address
+                        },
+                        theme: {
+                        color:"#3399cc"
+                        }
+                    };
+
+                    console.log("Everything fine till razorpay object creation")
+                    
+                    let rzp = new Razorpay(options)
+                    rzp.open()
+                    // Need to fill in the options variable whiich will inturn open the razorpay prompt
+                    // entering the details will return a payment_id, which can then be used to retrieve payment details 
                     this.$store.commit('clearCart')
                     this.$router.push('/cart/success')
-                })
+                }
+   
+                )                
                 .catch(error => {
-                    this.errors.push('Something went wrong. Please try again')
+                    this.errors.push('Something went wrong. Please try again. Line 249')
 
                     console.log(error)
                 })
-
-                this.$store.commit('setIsLoading', false)
+            
+            
+            
+            this.$store.commit('setIsLoading', false)
+            
+            
+            
+            
         }
     },
     computed: {

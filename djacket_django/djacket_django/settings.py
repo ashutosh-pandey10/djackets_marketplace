@@ -28,7 +28,8 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 STRIPE_SECRET_KEY = "sk_test_51N2cSHSD9HKG8yGIRmPu4DErmUfPxQk7n1gJWNT9iNtkeoxFUW1CSNYm1BEZ66zAVre1Mg1x1Vbk28oKckFiERYq00wOIZlVfM"
-
+RPZ_SECRET_KEY = "LAip9602czN9MlqUVi6BpvQb"
+RPZ_PUBLIC_KEY = "rzp_test_sMaBGTDZ8szQZG"
 # Application definition
 
 INSTALLED_APPS = [
@@ -46,6 +47,12 @@ INSTALLED_APPS = [
     'product',
     'order',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+       'rest_framework.authentication.TokenAuthentication',
+   ),
+}
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080" #This would later be replaced by the live link to the application 

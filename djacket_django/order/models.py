@@ -8,6 +8,7 @@ from product.models import Product
 
 class Order(models.Model):
     user = models.ForeignKey(User, related_name="orders", on_delete=models.CASCADE)
+    order_id = models.CharField(max_length=100, blank=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.CharField(max_length=100)
@@ -16,9 +17,8 @@ class Order(models.Model):
     place = models.CharField(max_length=100)
     phone = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
-    paid_amount = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
-    stripe_token = models.CharField(max_length=100)
-
+    paid_amount = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)    
+    
     class Meta:
         ordering = ["-created_at",]
 

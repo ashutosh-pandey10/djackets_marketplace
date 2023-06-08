@@ -22,6 +22,7 @@ class MyOrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = (
             "id",
+            "order_id",
             "first_name",
             "last_name",
             "email",
@@ -29,9 +30,8 @@ class MyOrderSerializer(serializers.ModelSerializer):
             "zipcode",
             "place",
             "phone",
-            "stripe_token",
             "items",
-            "paid_amount"
+            "paid_amount",
         )
 
 class OrderItemSerializer(serializers.ModelSerializer):    
@@ -52,12 +52,12 @@ class OrderSerializer(serializers.ModelSerializer):
             "id",
             "first_name",
             "last_name",
+            "order_id",
             "email",
             "address",
             "zipcode",
             "place",
             "phone",
-            "stripe_token",
             "items",
         )
     
