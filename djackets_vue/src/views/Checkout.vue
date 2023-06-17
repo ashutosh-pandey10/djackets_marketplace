@@ -228,27 +228,7 @@ export default {
 
                         handler: function(res){
                             // Put up a function over here to verify payment by not using Django
-                            fetch('/api/v1/validate_payment/', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'X-CSRFToken': '{{ csrf_token }}'
-                                        },
-                                        credentials: 'same-origin',
-                                        body: JSON.stringify({
-                                            'razorpay_payment_id': res.razorpay_payment_id,
-                                            'razorpay_order_id': res.razorpay_order_id,
-                                            'razorpay_signature': res.razorpay_signature
-                                        })
-                                    })
-                                    .then(function(response) {
-                                        return response.json();
-                                    })
-                                    .catch(error => {
-                                        this.errors.push('Something went wrong. Please try again. Line 249')
-
-                                        console.log(error)
-                                    })
+                            alert("Payment done with id - " + res.razorpay_payment_id)
                             
                         },
                         prefill: {
